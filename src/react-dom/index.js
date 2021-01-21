@@ -20,9 +20,7 @@ const render = (vnode, container, curContext) => {
             return targetDom;
         }
         let dom;
-        if(vnode.renderDom){
-            dom = vnode.renderDom
-        }else{
+        if(vnode.tag){
             dom = document.createElement(vnode.tag);
         }
         if(vnode.attrs){
@@ -33,30 +31,33 @@ const render = (vnode, container, curContext) => {
         }
         console.log('=vnode=111', vnode, vnode.renderDom, Object.keys(vnode));
         if(vnode.renderDom){
-            console.log('=111=', 111, dom);
-            render(vnode.renderDom, )
-            // vnode.renderDom.parentNode.replaceChild(vnode.renderDom, dom);
+            const renderer = vnode.render();
+            console.log('=111=', 111, renderer, vnode.renderDom, vnode.renderDom.parentNode);
+            render(renderer, vnode.renderDom.parentNode, 123)
             return;
         }else{
             // vnode.renderDom = dom;
         }
-        let num = index++;
-        // console.log('=num=111', num);
-        vnode.xxx = num;
-        console.log('=container=111================', container, dom, dom.parentNode);
+        console.log('%c container=================', 'color:green;font-size:20px');
+        console.log('=container=', container, container.childNodes, dom, (dom && dom.parentNode), vnode);
         if(container){
             const childs = container.childNodes;
-            // if(dom.parentNode){
-            //     container.replaceChild(dom, container.childNodes[0]);
+            let ret;
+            if(curContext == 123){
+                return container.replaceChild(dom, childs[0]);
+            }
+            // if(childs.length){
+            //     ret = container.replaceChild(dom, childs[0]);
             // }else{
-                container.appendChild(dom);
-                return dom;
+                ret = container.appendChild(dom);
             // }
+            return ret;
         }
     }
 }
 
 const setDomAttrs = (dom, attrs)=>{
+    console.log('=dom, attrs=', dom, attrs);
     Object.keys(attrs).map(i=>{
         const value = attrs[i] || '';
         if(i == 'style'){
@@ -67,6 +68,9 @@ const setDomAttrs = (dom, attrs)=>{
                     dom && (dom.style[j] = value[j]);
                 })
             }
+        }
+        else if(i.startsWith('on')){
+            dom[i.toLocaleLowerCase()] = value;
         }else{
             dom[i] = value;
         }

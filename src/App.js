@@ -13,8 +13,14 @@ class App extends React.Component {
     componentDidMount(){
         // console.log('我是componentDidMount',this.setState);
         console.log('====================================================', );
+        // this.setState({
+        //     text: 'componentDidMount里新设置的值'
+        // })
+    }
+    handleClick (){
+        console.log('=点击事件=', this);
         this.setState({
-            text: 'componentDidMount里新设置的值'
+            text: '点击事件里新设置的值'
         })
     }
     render() {
@@ -30,6 +36,7 @@ class App extends React.Component {
             <p>
             state = {text}
             </p>
+            <p><a onClick={this.handleClick.bind(this)}>点击我</a></p>
             </div>
         )
     }
