@@ -1,42 +1,40 @@
 import React from './react/index';
 import styles from './style.less';
-
+import Header from './Header';
 class App extends React.Component {
     constructor(props) {
         super(props);
-        // console.log('=props=', props);
         this.props = props;
         this.state = {
-            text: '原始文本'
+            text: '原始文本',
+            headerText: '标题1'
         }
     }
-    componentDidMount(){
-        // console.log('我是componentDidMount',this.setState);
-        console.log('====================================================', );
-        // this.setState({
-        //     text: 'componentDidMount里新设置的值'
-        // })
+    componentDidMount() {
+        console.log('APP的componentDidMount====================================================',);
     }
-    handleClick (){
-        console.log('=点击事件=', this);
+    componentWillReceiveProps(nextProps) {
+    }
+    handleClick() {
+        console.clear();
         this.setState({
-            text: '点击事件里新设置的值'
+            text: '点击事件里新设置的值',
+            headerText: '新的header'
         })
     }
     render() {
-        // console.log('=this.props=', this.props);
         const { fatherText = '888' } = this.props || {};
         const { text = '默认值' } = this.state;
-        // console.log('=app render=', this.props, this.state);
         return (
             <div style={{ border: '1px solid yellow' }} className={'container ' + styles.newStyle}>
-            <p>
-            props = {fatherText}
-            </p>
-            <p>
-            state = {text}
-            </p>
-            <p><a onClick={this.handleClick.bind(this)}>点击我</a></p>
+                <Header text={this.state.headerText} />
+                <p>
+                    props = {fatherText}
+                </p>
+                <p>
+                    state = {text}
+                </p>
+                <p><a onClick={this.handleClick.bind(this)}>点击我</a></p>
             </div>
         )
     }
