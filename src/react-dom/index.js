@@ -1,12 +1,12 @@
-let index = 1;
 const render = (vnode, container, curContext) => {
     console.log('=render=', { vnode, renderDom: (vnode && vnode.renderDom), container, curContext });
     if (container && vnode) {
 
         if (vnode.renderDom) {
             const renderer = vnode.render();
+            console.log('当前节点已存在，比较已有节点和虚拟节点：', vnode.renderDom, renderer, vnode);
             const targetDom = diffNode(vnode.renderDom, renderer);
-            console.log('=targetDom=', targetDom, container);
+            console.log('本次render比较结束=', targetDom, container);
             container.appendChild(targetDom);
             return;
         }
@@ -66,22 +66,23 @@ const diffNode = (dom, vnode) => {
             dom.textContent = vnode;
         } else {
             out = document.createTextNode(vnode);
-            if(dom && dom.parentNode){
+            if (dom && dom.parentNode) {
                 dom.parentNode.replaceChild(out, dom);
             }
         }
         return out;
     }
-    if(typeof vnode.tag == 'function'){
+    if (typeof vnode.tag == 'function') {
         return diffComponent(dom, vnode);
     }
-    if(!out){
+    if (!out) {
         out = document.createElement(vnode.tag);
         console.log('创建dom', out, vnode);
         setDomAttrs(out, vnode.attrs);
     }
     // 如果是普通节点
-    if((vnode.children && vnode.children.length) || (out.childNodes && out.childNodes.length)){
+    // 第一次进入vnode = App 对象， out=当前已存在的dom
+    if ((vnode.children && vnode.children.length) || (out.childNodes && out.childNodes.length)) {
         diffChildren(out, vnode.children);
     }
 
@@ -91,21 +92,24 @@ const diffNode = (dom, vnode) => {
     return out;
 }
 
-function diffComponent(dom, vnode){
+function diffComponent(dom, vnode) {
     console.log('=diffComponent=', dom, vnode, dom._component, vnode._component);
     // if(dom){
     //     setDomAttrs(dom, vnode.attrs);
     // }
     const component = dom._component;
     console.log('=component=678', component, component.constructor == vnode.tag);
-    if(component.constructor == vnode.tag){
-        console.log('组件没有变化',component, vnode);
+    if (component.constructor == vnode.tag) {
+        console.log('组件没有变化', component, vnode);
         // setDomAttrs(component, vnode.attrs);
         component.props = vnode.attrs;
 
-        renderComponent(component);
+        const renderer = component.render();
+        console.log('=renderer=', component.renderDom, renderer);
+        component.renderDom = diffNode(component.renderDom, renderer);
+        
         dom = component.renderDom;
-    }else{
+    } else {
         setDomAttrs(component.renderDom, vnode.attrs);
         dom = component.renderDom;
         const renderer = component.render();
@@ -248,7 +252,7 @@ function diffChildren(dom, vchildren) {
 
 const setDomAttrs = (dom, attrs) => {
     console.log('=dom, attrs=', dom, attrs);
-    if(!attrs) return;
+    if (!attrs) return;
     Object.keys(attrs).map(i => {
         const value = attrs[i] || '';
         if (i == 'style') {
